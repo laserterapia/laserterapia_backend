@@ -15,6 +15,9 @@ function generateToken(params = {}) {
 router.post("/admin-register", async (req, res) => {
   try {
     const { email, password, registeredEmail } = req.body;
+    if (await Authorized.find({ registeredEmail: registeredEmail })) {
+      return res.status(400).send({ error: "Email já cadastrado" });
+    }
     if (email === "admin" && password === "admin") {
       await Authorized.create({
         email: registeredEmail
@@ -28,6 +31,41 @@ router.post("/admin-register", async (req, res) => {
   } catch (error) {
     console.log(error);
   }
+  // try {
+  //   const searchedEmail = await Authorized.find({
+  //     email: "agnaldo.junior111@gmail.com"
+  //   });
+  //   let authorizedEmail;
+  //   let id = "";
+  //   searchedEmail.map(e => {
+  //     id = e._id;
+  //     authorizedEmail = e;
+  //   });
+  //   authorizedEmail = authorizedEmail.toObject();
+  //   const updated = await Authorized.findByIdAndUpdate(id, {
+  //     ...authorizedEmail,
+  //     teste: ["123", "456"],
+  //     email: "agnaldo.junior222@gmail.com"
+  //   });
+  //   res.send({ updated });
+  // } catch (e) {
+  //   console.log(e);
+  // }
+});
+
+router.get("/authorized-emails", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (email !== "admin") {
+      res.status(403).send({
+        error: "Você não está autorizado a ver os emails cadastrados"
+      });
+    }
+    const emails = await Authorized.find();
+    res.send({ emails });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 router.post("/register", async (req, res) => {
@@ -35,6 +73,9 @@ router.post("/register", async (req, res) => {
     const { email } = req.body;
     if (await User.findOne({ email })) {
       return res.status(400).send({ error: "Usuario ja existe" });
+    }
+    if(await !Authorized.find({email: email})){
+      return res.status(403).send({error: "Você não está autorizado a se cadastrar no sistema."})
     }
     const user = await User.create(req.body);
     user.password = undefined;
@@ -47,7 +88,11 @@ router.post("/register", async (req, res) => {
 router.post("/authenticate", async (req, res) => {
   const { email, password } = req.body;
   if (email === "admin" && password === "admin") {
-    const admin = User.create({ name: "admin", email: email, password: password });
+    const admin = User.create({
+      name: "admin",
+      email: email,
+      password: password
+    });
     res.send({ token: generateToken({ id: admin.id }) });
   } else {
     const user = await User.findOne({ email }).select("+password");
