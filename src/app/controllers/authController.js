@@ -2,7 +2,6 @@ const express = require("express");
 const User = require("../models/user");
 const Authorized = require("../models/authorized");
 const router = express.Router();
-const authMiddleware = require('../middlewares/auth')
 const jwt = require("jsonwebtoken");
 const authConfig = require("../../config/auth");
 const crypto = require("crypto");
@@ -10,8 +9,6 @@ const crypto = require("crypto");
 function generateToken(params = {}) {
   return jwt.sign(params, authConfig.secret);
 }
-
-router.use(authMiddleware)
 
 router.post("/admin-register", async (req, res) => {
   try {
