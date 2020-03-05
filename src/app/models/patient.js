@@ -3,7 +3,8 @@ const mongoose = require("../../database");
 const PatientSchema = new mongoose.Schema({
   name: { type: String, required: true },
   age: Number,
-  profilePicture: { type: Buffer, contentType: String },
+  cpf: String,
+  profilePicture: String,
   createdAt: { type: Date, default: Date.now },
   applications: [{ type: mongoose.Schema.Types.ObjectId, ref: "Application" }]
 });

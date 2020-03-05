@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../models/user");
 const Authorized = require("../models/authorized");
 const router = express.Router();
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authConfig = require("../../config/auth");
 const crypto = require("crypto");
@@ -62,7 +63,10 @@ router.post("/register", async (req, res) => {
     if (await User.findOne({ email })) {
       return res.status(400).send({ error: "Usuario ja existe" });
     }
+    const cripted_password = bcrypt.hashSync(req.body.password);
     const user = await User.create(req.body);
+    user.password = cripted_password;
+    user.save();
     user.password = undefined;
     return res.send({ user, token: generateToken({ id: user.id }) });
   } catch (error) {
@@ -86,7 +90,7 @@ router.post("/authenticate", async (req, res) => {
     if (!user) {
       return res.status(400).send({ error: "Usuário não existe" });
     }
-    if (password !== user.password) {
+    if (!bcrypt.compareSync(password, user.password)) {
       return res.status(400).send({ error: "Senha inválida" });
     }
     user.password = undefined;
@@ -125,16 +129,19 @@ router.post("/forgot-password", async (req, res) => {
     const now = new Date();
     now.setHours(now.getHours() + 1);
 
+    const cripted_password = bcrypt.hashSync(newPassword, authConfig.salt);
+
     await User.findByIdAndUpdate(user.id, {
       $set: {
         passwordResetToken: token,
         passwordResetExpires: now,
-        password: newPassword
+        password: cripted_password
       }
     });
 
     res.status(200).send();
   } catch (error) {
+    console.log(error);
     res.status(400).send({ error: "Erro ao recuperar a senha" });
   }
 });

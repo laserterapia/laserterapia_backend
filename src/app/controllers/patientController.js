@@ -2,14 +2,14 @@ const express = require("express");
 const Patient = require("../models/patient");
 const Application = require("../models/application");
 const router = express.Router();
-const authMiddleware = require('../middlewares/auth')
+const authMiddleware = require("../middlewares/auth");
 
-router.use(authMiddleware)
+router.use(authMiddleware);
 
 router.post("/register", async (req, res) => {
   try {
-    const { name, age, id } = req.body;
-    if (await Patient.findById(id)) {
+    const { name, age, cpf } = req.body;
+    if (await Patient.findOne({cpf: cpf})) {
       res.status(400).send({ error: "O paciente já existe." });
     }
     const patient = await Patient.create({ name: name, age: age });
@@ -81,6 +81,19 @@ router.get("/patient_applications", async (req, res) => {
     res
       .status(400)
       .send({ error: `Não foi possível listar as aplicações do paciente` });
+  }
+});
+
+router.post("/insert_images", async (req, res) => {
+  try {
+    const { application_id, photo } = req.body;
+    const application = await Application.findById(application_id);
+    application.images.push(photo);
+    application.save();
+    res.send({application})
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ error: "Erro ao adicionar uma imagem a aplicação." });
   }
 });
 
