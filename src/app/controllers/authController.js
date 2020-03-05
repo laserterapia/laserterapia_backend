@@ -63,7 +63,7 @@ router.post("/register", async (req, res) => {
     if (await User.findOne({ email })) {
       return res.status(400).send({ error: "Usuario ja existe" });
     }
-    const cripted_password = bcrypt.hashSync(req.body.password);
+    const cripted_password = bcrypt.hashSync(req.body.password, authConfig.salt);
     const user = await User.create(req.body);
     user.password = cripted_password;
     user.save();
