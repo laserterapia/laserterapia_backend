@@ -1,18 +1,36 @@
-const path = require('path')
-const nodemailer = require('nodemailer')
-const { host, port, user, pass } = require('../config/mail.json')
-const hbs = require('nodemailer-express-handlebars')
+const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
 
-const transport = nodemailer.createTransport({
-  host,
-  port,
-  auth: { user, pass }
-});
+const { host, port, user, pass } = require("../config/mail.json");
 
-transport.use('compile', hbs({
-  viewEngine: { partialsDir: '/teste', defaultLayout: false },
-  viewPath: path.resolve('./resources/mail/'),
-  extName: '.html'
-}))
+sendEmail = (email, token) => {
+  nodemailer.createTestAccount((err, account) => {
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      host,
+      port,
+      auth: { user, pass }
+    });
 
-module.exports = transport
+    mailOptions = {
+      from: "laserterapia.noreply@gmail.com",
+      to: email,
+      subject: "Email de Verificação",
+      text:
+        "Clique no link de verificação para confirmar seu endereço de email \n \n " +
+        "https://www.google.com.br/" +
+        token
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        return
+      }
+      console.log("Message sent: %s", info.messageId);
+    });
+  });
+};
+
+module.exports = sendEmail;

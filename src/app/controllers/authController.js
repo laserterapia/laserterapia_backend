@@ -6,6 +6,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authConfig = require("../../config/auth");
 const crypto = require("crypto");
+const mailer = require("../../modules/mailer");
 
 function generateToken(params = {}) {
   return jwt.sign(params, authConfig.secret);
@@ -63,7 +64,10 @@ router.post("/register", async (req, res) => {
     if (await User.findOne({ email })) {
       return res.status(400).send({ error: "Usuario ja existe" });
     }
-    const cripted_password = bcrypt.hashSync(req.body.password, authConfig.salt);
+    const cripted_password = bcrypt.hashSync(
+      req.body.password,
+      authConfig.salt
+    );
     const user = await User.create(req.body);
     user.password = cripted_password;
     user.save();
@@ -117,7 +121,7 @@ router.get("/check_email", async (req, res) => {
 });
 
 router.post("/forgot-password", async (req, res) => {
-  const { email, newPassword } = req.body;
+  const { email } = req.body;
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -129,15 +133,14 @@ router.post("/forgot-password", async (req, res) => {
     const now = new Date();
     now.setHours(now.getHours() + 1);
 
-    const cripted_password = bcrypt.hashSync(newPassword, authConfig.salt);
-
     await User.findByIdAndUpdate(user.id, {
       $set: {
         passwordResetToken: token,
-        passwordResetExpires: now,
-        password: cripted_password
+        passwordResetExpires: now
       }
     });
+
+    mailer(email, token);
 
     res.status(200).send();
   } catch (error) {

@@ -1,6 +1,6 @@
 {
-  "host": "smtp.mailtrap.io",
-  "port": 2525,
-  "user": "4977cf307144e2",
-  "pass": "c212e0daa137d1"
+  "host": "smtp.gmail.com",
+  "port": 587,
+  "user": "laserterapia.noreply@gmail.com",
+  "pass": "@laserterapia"
 }
