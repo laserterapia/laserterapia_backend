@@ -7,49 +7,40 @@ const jwt = require("jsonwebtoken");
 const authConfig = require("../../config/auth");
 const crypto = require("crypto");
 const mailer = require("../../modules/mailer");
+const admin = require("../middlewares/admin");
 
 function generateToken(params = {}) {
   return jwt.sign(params, authConfig.secret);
 }
 
-router.post("/admin-register", async (req, res) => {
+router.post("/admin-register", admin("admin"), async (req, res) => {
   try {
-    const { email, password, registeredEmail } = req.body;
-    if (email !== "admin" || password !== "admin") {
-      return res
-        .status(400)
-        .send({ error: "Você não está autorizado a cadastrar um email." });
-    }
+    const { registeredEmail } = req.body;
+
     if (await Authorized.findOne({ email: registeredEmail })) {
       return res.status(409).send({ error: "Email já cadastrado" });
     }
-    if (email === "admin" && password === "admin") {
-      await Authorized.create({
-        email: registeredEmail
-      });
-      res.send();
-    } else {
-      return res
-        .status(400)
-        .send({ error: "Você não está autorizado a cadastrar um email." });
-    }
+    await Authorized.create({
+      email: registeredEmail
+    });
+    res.send();
   } catch (error) {
     console.log(error);
+    return res
+      .status(400)
+      .send({ error: "Você não está autorizado a cadastrar um email." });
   }
 });
 
-router.get("/authorized-emails", async (req, res) => {
+router.get("/authorized-emails", admin("admin"), async (req, res) => {
   try {
-    const { email } = req.body;
-    if (email !== "admin") {
-      res.status(403).send({
-        error: "Você não está autorizado a ver os emails cadastrados"
-      });
-    }
     const emails = await Authorized.find();
-    res.send({ emails });
+    return res.send({ emails });
   } catch (error) {
     console.log(error);
+    return res
+      .status(400)
+      .send({ error: "Erro ao listar os emails cadastrados." });
   }
 });
 
@@ -146,6 +137,37 @@ router.post("/forgot-password", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(400).send({ error: "Erro ao recuperar a senha" });
+  }
+});
+
+router.post("/reset-password", async (req, res) => {
+  const { email, token, password } = req.body;
+  try {
+    const user = await User.findOne({ email }).select(
+      "+passwordResetToken passwordResetExpires"
+    );
+
+    if (!user) {
+      res.status(400).send({ error: "Usuário não existe" });
+    }
+
+    if (token !== user.passwordResetToken) {
+      res.status(400).send({ error: "Token inválido" });
+    }
+
+    const now = new Date();
+
+    if (now > user.passwordResetExpires) {
+      res.status(400).send({ error: "Token expirado. Gere um novo." });
+    }
+
+    user.password = password;
+
+    await user.save();
+
+    res.send();
+  } catch (err) {
+    res.status(400).send({ error: "Não pode resetar a senha" });
   }
 });
 

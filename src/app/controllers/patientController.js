@@ -3,10 +3,11 @@ const Patient = require("../models/patient");
 const Application = require("../models/application");
 const router = express.Router();
 const authMiddleware = require("../middlewares/auth");
+const admin = require('../middlewares/admin')
 
 router.use(authMiddleware);
 
-router.post("/register", async (req, res) => {
+router.post("/register", admin(), async (req, res) => {
   try {
     const { name, age, cpf } = req.body;
     if (await Patient.findOne({cpf: cpf})) {
@@ -22,7 +23,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", admin(), async (req, res) => {
   try {
     const patients = await Patient.find();
     res.send({ patients });
@@ -31,7 +32,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/update", async (req, res) => {
+router.post("/update", admin(), async (req, res) => {
   try {
     const { id, name, age } = req.body;
     const patient = await Patient.findByIdAndUpdate(id, {
@@ -49,7 +50,7 @@ router.post("/update", async (req, res) => {
   }
 });
 
-router.post("/insert_application", async (req, res) => {
+router.post("/insert_application", admin(), async (req, res) => {
   try {
     const { patient_id } = req.body;
     const patient = await Patient.findById(patient_id);
@@ -63,7 +64,7 @@ router.post("/insert_application", async (req, res) => {
   }
 });
 
-router.get("/patient_applications", async (req, res) => {
+router.get("/patient_applications", admin(), async (req, res) => {
   try {
     const { patient_id } = req.body;
     let applications = [];
@@ -84,7 +85,7 @@ router.get("/patient_applications", async (req, res) => {
   }
 });
 
-router.post("/insert_images", async (req, res) => {
+router.post("/insert_images", admin(), async (req, res) => {
   try {
     const { application_id, photo } = req.body;
     const application = await Application.findById(application_id);
