@@ -1,6 +1,6 @@
 {
   "host": "smtp.gmail.com",
-  "port": 587,
+  "port": 465,
   "user": "laserterapia.noreply@gmail.com",
   "pass": "@laserterapia"
 }
