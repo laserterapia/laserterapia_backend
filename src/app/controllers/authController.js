@@ -49,15 +49,13 @@ router.post("/register", async (req, res) => {
     const { email } = req.body;
     if (!(await Authorized.findOne({ email }))) {
       return res
-        .status(403)
         .send({ error: "Você não está autorizado a se cadastrar no sistema." });
     }
     if (await User.findOne({ email })) {
-      return res.status(400).send({ error: "Usuario ja existe" });
+      return res.send({ error: "Usuario ja existe" });
     }
     const cripted_password = bcrypt.hashSync(
-      req.body.password,
-      authConfig.salt
+      req.body.password
     );
     const user = await User.create(req.body);
     user.password = cripted_password;
@@ -73,41 +71,19 @@ router.post("/register", async (req, res) => {
 router.post("/authenticate", async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (email === "admin" && password === "admin") {
-      const admin = User.create({
-        name: "admin",
-        email: email,
-        password: password
-      });
-      return res.send({ admin, token: generateToken({ id: admin.id }) });
-    }
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
-      return res.status(400).send({ error: "Usuário não existe" });
+      return res.send({ error: "Usuário não existe" });
     }
+
     if (!bcrypt.compareSync(password, user.password)) {
-      return res.status(400).send({ error: "Senha inválida" });
+      return res.send({ error: "Senha inválida" });
     }
     user.password = undefined;
     return res.send({ user, token: generateToken({ id: user.id }) });
   } catch (error) {
     console.log(error);
-    res.status(400).send({ error: "Ocorreu um erro na autenticação" });
-  }
-});
-
-router.get("/check_email", async (req, res) => {
-  try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-      res.status(400).send({ error: "Email não cadastrado no sistema" });
-    } else {
-      res.send(200);
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(400).send({ error: "Ocorreu um erro na checagem do email" });
+    return res.status(400).send({ error: "Ocorreu um erro na autenticação" });
   }
 });
 

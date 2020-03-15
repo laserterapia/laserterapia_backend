@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
   },
   role: { type: String, enum: ["admin", "user"], default: "user" },
   password: { type: String, required: true, select: false },
-  course: { type: String, required: true },
+  course: { type: String },
   profilePicture: String,
   passwordResetToken: { type: String, select: false },
   passwordResetExpires: { type: Date, select: false },

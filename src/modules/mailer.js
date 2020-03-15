@@ -17,10 +17,10 @@ sendEmail = (email, token) => {
       from: "laserterapia.noreply@gmail.com",
       to: email,
       subject: "Email de Verificação",
-      text:
-        "Clique no link de verificação para confirmar seu endereço de email \n \n " +
-        "https://www.google.com.br/" +
-        token
+      text: "que linda linda ta tao linda linda tao linda linda"
+        // "Clique no link de verificação para confirmar seu endereço de email \n \n " +
+        // "https://www.google.com.br/" +
+        // token
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
