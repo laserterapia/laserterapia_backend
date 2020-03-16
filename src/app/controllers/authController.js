@@ -107,9 +107,7 @@ router.post("/forgot-password", async(req, res) => {
             }
         });
 
-        mailer(email, token);
-
-        return res.status(200).send({ message: "Sucesso ao enviar o email" });
+        mailer(email, token, res);
     } catch (error) {
         console.log(error);
         return res.status(400).send({ error: "Erro ao recuperar a senha" });

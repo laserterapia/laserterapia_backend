@@ -4,7 +4,7 @@ const OAuth2 = google.auth.OAuth2;
 
 const { host, port, user, pass } = require("../config/mail.json");
 
-sendEmail = (email, token) => {
+sendEmail = (email, token, res) => {
   nodemailer.createTestAccount((err, account) => {
     const transporter = nodemailer.createTransport({
       service: "Gmail",
@@ -17,18 +17,18 @@ sendEmail = (email, token) => {
       from: "laserterapia.noreply@gmail.com",
       to: email,
       subject: "Email de Verificação",
-      text: "que linda linda ta tao linda linda tao linda linda"
-        // "Clique no link de verificação para confirmar seu endereço de email \n \n " +
-        // "https://www.google.com.br/" +
-        // token
+      text:
+        "Clique no link de verificação para confirmar seu endereço de email \n \n " +
+        "https://www.google.com.br/" +
+        token
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.log(error);
-        return
+        return res.send({ error: "Erro ao enviar o e-mail" });
       }
       console.log("Message sent: %s", info.messageId);
+      return res.status(200).send({ message: "Sucesso ao enviar o email" });
     });
   });
 };
