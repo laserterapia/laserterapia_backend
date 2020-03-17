@@ -5,32 +5,31 @@ const OAuth2 = google.auth.OAuth2;
 const { host, port, user, pass } = require("../config/mail.json");
 
 sendEmail = (email, token, res) => {
-  nodemailer.createTestAccount((err, account) => {
-    const transporter = nodemailer.createTransport({
-      service: "Gmail",
-      host,
-      port,
-      auth: { user, pass }
-    });
+    nodemailer.createTestAccount((err, account) => {
+        const transporter = nodemailer.createTransport({
+            service: "Gmail",
+            host,
+            port,
+            auth: { user, pass }
+        });
 
-    mailOptions = {
-      from: "laserterapia.noreply@gmail.com",
-      to: email,
-      subject: "Email de Verificação",
-      text:
-        "Clique no link de verificação para confirmar seu endereço de email \n \n " +
-        "https://www.google.com.br/" +
-        token
-    };
+        mailOptions = {
+            from: "laserterapia.noreply@gmail.com",
+            to: email,
+            subject: "Email de Verificação",
+            text: "Clique no link de verificação para confirmar seu endereço de email \n \n " +
+                "http://localhost:3001/reset_password?=" +
+                token
+        };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        return res.send({ error: "Erro ao enviar o e-mail" });
-      }
-      console.log("Message sent: %s", info.messageId);
-      return res.status(200).send({ message: "Sucesso ao enviar o email" });
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return res.send({ error: "Erro ao enviar o e-mail" });
+            }
+            console.log("Message sent: %s", info.messageId);
+            return res.status(200).send({ message: "Sucesso ao enviar o email" });
+        });
     });
-  });
 };
 
 module.exports = sendEmail;
