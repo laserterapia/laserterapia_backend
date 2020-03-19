@@ -8,6 +8,8 @@ const authConfig = require("../../config/auth");
 const crypto = require("crypto");
 const mailer = require("../../modules/mailer");
 const admin = require("../middlewares/admin");
+const Cryptr = require('cryptr')
+const cryptr = new Cryptr(authConfig.secret)
 
 function generateToken(params = {}) {
     return jwt.sign(params, authConfig.secret);
@@ -106,7 +108,9 @@ router.post("/forgot-password", async(req, res) => {
             }
         });
 
-        mailer(email, token, res);
+        const crypted_email = cryptr.encrypt(email)
+
+        mailer(email, token, crypted_email, res);
     } catch (error) {
         console.log(error);
         return res.status(400).send({ error: "Erro ao recuperar a senha" });
@@ -116,7 +120,8 @@ router.post("/forgot-password", async(req, res) => {
 router.post("/reset-password", async(req, res) => {
     const { email, token, password } = req.body;
     try {
-        const user = await User.findOne({ email }).select(
+        const decrypted_email = cryptr.decrypt(email)
+        const user = await User.findOne({ email: decrypted_email  }).select(
             "+passwordResetToken passwordResetExpires"
         );
 

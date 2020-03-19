@@ -4,7 +4,7 @@ const OAuth2 = google.auth.OAuth2;
 
 const { host, port, user, pass } = require("../config/mail.json");
 
-sendEmail = (email, token, res) => {
+sendEmail = (email, token, crypted_email, res) => {
     nodemailer.createTestAccount((err, account) => {
         const transporter = nodemailer.createTransport({
             service: "Gmail",
@@ -18,8 +18,8 @@ sendEmail = (email, token, res) => {
             to: email,
             subject: "Email de Verificação",
             text: "Clique no link de verificação para confirmar seu endereço de email \n \n " +
-                "http://localhost:3001/reset_password?=" +
-                token
+                "http://localhost:3001/reset_password?t=" +
+                token + "=&e=" + crypted_email
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
