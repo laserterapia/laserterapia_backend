@@ -28,7 +28,7 @@ router.get("/", admin(), async (req, res) => {
     const patients = await Patient.find();
     res.send({ patients });
   } catch (error) {
-    res.status(400).send({ error: "Erro ao listar os pacientes." });
+    res.send({ error: "Erro ao listar os pacientes." });
   }
 });
 
@@ -41,7 +41,7 @@ router.post("/update", admin(), async (req, res) => {
     });
     patient = patient.toObject();
     if (!patient) {
-      res.status(400).send({ error: "Usuário não existe" });
+      res.send({ error: "Usuário não existe" });
     }
     res.send({ patient });
   } catch (error) {
