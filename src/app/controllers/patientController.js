@@ -35,7 +35,7 @@ router.get("/", admin(), async (req, res) => {
 router.post("/update", admin(), async (req, res) => {
   try {
     const { id, name, age } = req.body;
-    const patient = await Patient.findByIdAndUpdate(id, {
+    let patient = await Patient.findByIdAndUpdate(id, {
       name: name,
       age: age
     });

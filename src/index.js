@@ -4,8 +4,8 @@ const cors = require('cors')
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: '15mb', extended: true}));
+app.use(bodyParser.urlencoded({limit: '15mb', extended: true}));
 app.use(cors())
 app.options('http://localhost:3001', cors())
 
