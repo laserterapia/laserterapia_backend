@@ -7,8 +7,8 @@ const app = express();
 app.use(bodyParser.json({limit: '15mb', extended: true}));
 app.use(bodyParser.urlencoded({limit: '15mb', extended: true}));
 app.use(cors())
-app.options('http://localhost:3001', cors())
+app.options('http://localhost:3000', cors())
 
 require("./app/controllers/index")(app);
 
-app.listen(3000);
+app.listen(3003);
