@@ -3,6 +3,7 @@ const mongoose = require("../../database");
 const PatientSchema = new mongoose.Schema({
   susCard: {type: String, required: true, unique: true },
   name: { type: String, required: true },
+  cpf: { type: String, required: true },
   sex: { type: String, enum: ["Masculino", "Feminino"], required: true },
   birthday: { type: String, required: true },
   momName: { type: String, required: true },
@@ -52,7 +53,7 @@ const PatientSchema = new mongoose.Schema({
     enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
   },
   medication: { type: String },
-  alergies: [String],
+  alergies: String,
   responsibleName: String, 
   weigth: Number,
   height: Number,

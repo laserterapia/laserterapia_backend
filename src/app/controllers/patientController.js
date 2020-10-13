@@ -9,17 +9,17 @@ router.use(authMiddleware);
 
 router.post("/register", admin(), async (req, res) => {
   try {
-    const { name, age, cpf } = req.body;
-    if (await Patient.findOne({cpf: cpf})) {
+    const { sentPatient } = req.body;
+    if (await Patient.findOne({cpf: sentPatient.cpf})) {
       res.status(400).send({ error: "O paciente já existe." });
     }
-    const patient = await Patient.create({ name: name, age: age });
+    const patient = await Patient.create({...sentPatient});
     res.send({ patient });
   } catch (error) {
     console.log(error);
     res
       .status(400)
-      .send({ error: `Não foi possível cadastrar o paciente ${name}` });
+      .send({ error: `Não foi possível cadastrar o paciente ${sentPatient.name}` });
   }
 });
 
