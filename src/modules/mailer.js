@@ -18,7 +18,7 @@ sendEmail = (email, token, crypted_email, res) => {
             to: email,
             subject: "Email de Verificação",
             text: "Clique no link de verificação para confirmar seu endereço de email \n \n " +
-                "http://localhost:3001/reset_password?t=" +
+                "https://laserterapia.herokuapp.com/reset_password?t=" +
                 token + "=&e=" + crypted_email
         };
 
