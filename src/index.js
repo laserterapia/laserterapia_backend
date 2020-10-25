@@ -11,4 +11,4 @@ app.options('http://localhost:3000', cors())
 
 require("./app/controllers/index")(app);
 
-app.listen(3003);
+app.listen(process.env.PORT || 3003);
