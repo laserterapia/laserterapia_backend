@@ -24,6 +24,7 @@ sendEmail = (email, token, crypted_email, res) => {
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
+                console.log(error)
                 return res.send({ error: "Erro ao enviar o e-mail" });
             }
             console.log("Message sent: %s", info.messageId);
