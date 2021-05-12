@@ -19,7 +19,7 @@
     "googleapis": "^47.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.7",
-    "nodemailer": "^6.3.1",
+    "nodemailer": "^6.4.16",
     "nodemailer-express-handlebars": "^3.1.0",
     "path": "^0.12.7"
   }
